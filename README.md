@@ -18,9 +18,11 @@ This pipeline automates the analysis of the Human herpesevirus 5, also known as 
 Ensure you have the following dependencies installed:
 
 ### **Required Software**
-|-----------|---------|
-| Unix/Linux | kallisto, Bowtie2, SPAdes, samtools, BLAST+ |
-| Python    | biopython, pandas, os, subprocess | 
-| R | sleuth, dplyr  |
+
+| **Unix/Linux** | kallisto, Bowtie2, SPAdes, samtools, BLAST+ |
+
+| **Python**    | biopython, pandas, os, subprocess | 
+
+| **R** | sleuth, dplyr  |
 
 ## **2. Accessing Data
