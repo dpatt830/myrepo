@@ -2,10 +2,22 @@ from Bio import Entrez, SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 import Bio.SeqRecord
+import pandas as pd
+import os
+import subprocess
 
+# will need to make these input args
 email = "dpatterson3@luc.edu"
 accession = "NC_006273.2"
 
+def outputDirectory(dir_path):
+    '''Creating an output directory'''
+    os.makedirs(dir_path)
+
+def buildLogFile(logFileName):
+    '''Create out Log File/Output File'''
+    log_file = open(logFileName, "w")
+    return log_file
 
 def extract_cds_to_fasta(accession, email):
     '''With valid email and accession number of genome, retrieve CDS seq,
@@ -19,27 +31,301 @@ def extract_cds_to_fasta(accession, email):
     # List comp. to hold all features that are labeled as 'CDS'
     cds_content = [feature for feature in record.features if feature.type == "CDS"]
     
-    # Initialize first cds seq
-    first_cds = cds_content[0]
+    # initialize a lsit to hold all cds content
+    fasta_file = []
 
-    # looking thru each cds content/feature extract the cds seq and protein ID header
-    seq = (first_cds.extract(record.seq))
-    protein_seq = seq.translate(to_stop=True)
-    prot_id = first_cds.qualifiers.get("protein_id", ["unknown_protien"])[0]
+    for cds in cds_content:
+        # looking thru each cds content/feature extract the cds seq and protein ID header
+        seq = (cds.extract(record.seq))
+        prot_id = cds.qualifiers.get("protein_id", ["unknown_protien"])[0] # getting protein ID
 
-    # creating fasta record with translated seq and protein identifier/header
-    fasta_record = SeqRecord(protein_seq, id=prot_id)
+        # cappending to fasta list
+        fasta_file.append(SeqRecord(seq, id=prot_id))
 
     # Initializing CDS feature length and fasta file name
     num_CDS_feat = len(cds_content)
     fasta_name = f"{accession}-HCMV-transcriptome.fasta"
 
     # Using SeqIO to write a fasta file of the cds seq w/ identifier
-    SeqIO.write(fasta_record, fasta_name, 'fasta')
+    SeqIO.write(fasta_file, fasta_name, 'fasta')
     
     # Returning file name and num of cds features
     return(fasta_name, num_CDS_feat)
     
 
-# Example usage:
-print((extract_cds_to_fasta(accession, email)))
+def buildIndex(transcript_file, num_cds, log_path):
+    '''With our transcriptome fasta file and num of cds features of the reference genome'''
+
+    index_name = 'index.idx'  # Initialize index file name
+
+    kallisto_command = f'kallisto index -i {index_name} {transcript_file}' # Initialize kallisto command
+
+    os.system(kallisto_command) # run command
+
+    # Writing output to log file
+    with open(log_path, "w") as log:
+        log.write(f"The HCMV genome (NC_006273.2) has {num_cds} CDS.")
+        log.write("\n")
+
+    return index_name
+
+def kallistoTPM(index, logPath):
+    '''Initializing Kallisto script'''
+
+    # Create a kallisto output directory specific to each donor fastq pair
+    kallistoOutput = "kallisto"
+    os.makedirs(kallistoOutput)
+
+    # iterating thru each donor data folder
+    for donorFolder in os.listdir("./data/"):
+
+        # accessing the SRA run accession ID
+        SRArun = os.listdir(f"./data/{donorFolder}")[0][:10]
+
+        # getting forward and reverse fastq files
+        fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
+        rev = f"./data/{donorFolder}/{SRArun}_2.fastq"
+
+        # Create a kallisto output directory specific to each donor fastq pair
+        kallistoOutput = f"kallisto/{donorFolder}"
+        os.makedirs(kallistoOutput)
+
+        # creating kallisto command
+        # change index file command to {}
+        kallisto_command = f'nohup time kallisto quant -i {index} -o {kallistoOutput} -b 30 -t 2 {fwd} {rev} &'
+        os.system(kallisto_command)
+    
+    # preparing the header for tpm output
+    with open(logPath, 'a') as log:
+        log.write("sample    condition    min_tpm    med_tpm    mean_tpm    max_tpm")
+
+    return kallistoOutput
+
+def quantifyTPM(logPath, kallistoOutput):
+    '''Writing tpm output to log file'''
+
+    # Iterating each folder in the results folder of our kallisto folder
+    for donor_folder in os.listdir(kallistoOutput):
+        
+        # create a data frame of each abundance.tsv file & record the specific values within each donor
+        df = pd.read_csv(f"./{kallistoOutput}/{donor_folder}/abundance.tsv", sep='\t')
+        min_tpm = df["tpm"].min()
+        med_tpm = df["tpm"].median()
+        mean_tpm = df["tpm"].mean()
+        max_tpm = df["tpm"].max()
+
+        # Writing output to log file
+        with open(logPath, "a") as log:
+            log.write("\n")
+            log.write(f"{donor_folder[:10]}    {donor_folder[11:]}    {min_tpm}    {med_tpm}    {mean_tpm}    {max_tpm}")
+
+def metaData(kallistoOutput):
+    '''With kallisto result folders, create a meta data txt file for Sleuth'''
+
+    # create metadata txt file
+    with open("metadata.txt", 'w') as meta:
+        meta.write("sample condition path")
+        meta.write("\n")
+
+        # writing to the metadata txt file our sample, cond., and path
+        for donor in os.listdir(f'./{kallistoOutput}/'):
+            meta.write(f'{donor} {donor[18:]} {kallistoOutput}/{donor}')
+            meta.write("\n")
+
+def sleuthRun(logPath):
+    '''Running sleuth script and writing to logfile'''
+
+    # run our sleuth.R script
+    os.system("Rscript sleuth.R")
+
+    # with the fdr results txt, make a df
+    df = pd.read_csv("fdr05_results.txt",delimiter=" ")
+
+    # keep only the columns we want to write to the log file
+    columns_to_keep = ['target_id', "test_stat", "pval", "qval"]
+    df_select = df[columns_to_keep]
+
+    # write df results to log file
+    with open(logPath, "a") as log:
+        log.write("\n")
+        log.write("\n")
+        df_select.to_csv(log, header=True, index=False, sep="\t")
+
+def HCMVgenome(accession, email):
+    '''Fetching the full HCMV genome from NCBI and saving it as a fasta file'''
+
+    Entrez.email = email
+
+    stream = Entrez.efetch(db="nucleotide", id=accession, rettype="fasta", retmode="text")
+    record = SeqIO.read(stream, format="fasta")
+
+    fasta_output = "HCMV_genome.fasta"
+    # Save to a FASTA file
+    SeqIO.write(record, fasta_output, "fasta")
+
+    return fasta_output
+
+def bowtie(fastaFile):
+    '''With the full HCMV genome, build index using Bowtie 2,
+        and see how many seqs map to it of our fastq seqs'''
+
+    # create new output directory for bowtie2 index and for mapping
+    bowtie2_output = "bowtie2-Output"
+    bowtie2_index = "bowtie2-Index"
+    os.makedirs(bowtie2_output)
+    os.makedirs(bowtie2_index)
+
+    # initialize command for building index
+    bowtieIndexCommand = f"bowtie2-build {fastaFile} ./{bowtie2_index}/HCMV"
+    
+    # run bowtie 2 command to build index with full genome
+    os.system(bowtieIndexCommand)
+
+    # iterating thru each donor data folder; similar code to Kallisto run
+    for donorFolder in os.listdir("./data/"):
+
+        # accessing the SRA run accession ID
+        SRArun = os.listdir(f"./data/{donorFolder}")[0][:10]
+
+        # getting forward and reverse fastq files
+        fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
+        rev = f"./data/{donorFolder}/{SRArun}_2.fastq"
+
+        # creating bowtie2 mapping command
+        bowtieMapCommand = f'nohup bowtie2 --quiet -x ./{bowtie2_index}/HCMV -1 {fwd} -2 {rev} -S ./{bowtie2_output}/{donorFolder}-map.sam &'
+        os.system(bowtieMapCommand)
+    
+def bowtieLogFile(logPath):
+    '''With the SAM files output from our bowtie2 command, 
+        write mapped reads to log file'''
+    
+    # initialize lists to hold both read pairs for before and after Bowtie
+    before = []
+    after = []
+
+    # iterating our donor folders with the fastq folders
+    for donorFolder in os.listdir("./data/"):
+        # accessing the SRA run accession ID
+        SRArun = os.listdir(f"./data/{donorFolder}")[0][:10]
+
+        # getting forward fastq file
+        fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
+        
+        # using subprocess to hold the output of the number of read pairs before for each donor
+        reads_before = int(subprocess.check_output(f"wc -l < {fwd}", shell=True).strip())
+        
+        # appending result to before list
+        before.append(reads_before)
+    
+    # iterating each sam file output
+    for sam_file in os.listdir("./bowtie2-Output"):
+        # using samtools to count the num of read pairs in our sam files and appending to after list
+        mapped_reads = int(subprocess.check_output(f"samtools view -F 4 ./bowtie2-Output/{sam_file} | wc -l", shell=True).strip())
+        after.append(mapped_reads)
+
+    # writing to log file our read pairs from the lists
+    with open(logPath, 'a') as log:
+        log.write("\n")
+        log.write(f'Donor 1 (2dpi) had {before[0]} read pairs before Bowtie2 filtering and {after[0]} read pairs after.'+"\n")
+        log.write(f'Donor 1 (6dpi) had {before[1]} read pairs before Bowtie2 filtering and {after[1]} read pairs after.'+"\n")
+        log.write(f'Donor 3 (2dpi) had {before[2]} read pairs before Bowtie2 filtering and {after[2]} read pairs after.'+"\n")
+        log.write(f'Donor 3 (6dpi) had {before[3]} read pairs before Bowtie2 filtering and {after[3]} read pairs after.')
+
+def sam_to_fastq():
+    '''Converting the donor sam files to fastq files'''
+
+    # creating a directory for SPAdes
+    os.makedirs("spades")
+
+    # iterating thru the sam files from bowtie2
+    for sam_file in os.listdir("bowtie2-Output"):
+
+        # initialize command to convert SAM files to BAM files
+        bam_creation = f'samtools view -bS -F 4 ./bowtie2-Output/{sam_file} | samtools sort -o ./bowtie2-Output/{sam_file[:11]}-map.sorted.bam'
+
+        # initialize command to convert BAM files to fastq
+        fastq_creation = f'samtools fastq ./bowtie2-Output/{sam_file[:11]}-map.sorted.bam \
+                            -1 ./bowtie2-Output/{sam_file[:11]}-mapped_R1.fastq \
+                            -2 ./bowtie2-Output/{sam_file[:11]}-mapped_R2.fastq'
+        
+        # run the two file conversion commands
+        os.system(bam_creation)
+        os.system(fastq_creation)
+
+
+def spades(logPath):
+    '''Running the spades program through the command line,
+        using the mapped fastq files'''
+    
+    # initializing spades directory
+    spades_dir = "./spades"
+
+    # iterating thru all the files in the bowtie2-Output directory
+    for donor in os.listdir("./data/"):
+
+        # initialize forward and reverse mapped fastq file pairs
+        fwd = f"{donor}-mapped_R1.fastq"
+        rev = f"{donor}-mapped_R2.fastq"
+
+        # create new donor directory for spades outputs for each donor
+        donor_output_dir = f"{spades_dir}/{donor}"
+        os.makedirs(donor_output_dir)
+
+        # create spades command
+        spades_command = f"spades.py -k 77 -t 2 --only-assembler -1 ./bowtie2-Output/{fwd} -2 ./bowtie2-Output/{rev} -o {donor_output_dir}"
+
+        # run spades command
+        os.system(spades_command)
+
+        # write spades commands to log file
+        with open(logPath, 'a') as log:
+            log.write("\n")
+            log.write(spades_command+"\n")
+
+def contigs():
+    '''Get the longest contigs from each spades contig.fasta file'''
+
+    # make blast directory
+    blast_dir = "./blast/"
+
+    # run command
+    os.makedirs(blast_dir)
+
+    # for each donor prefix name
+    for donor in os.listdir("./data/"):
+
+        # creating command to grab the first seq in contigs.fasta file for each donor and create fasta file in blast directory
+        long_contig_command = "awk '/^>/ {if (seq) exit; seq=1} {print}' ./spades/"+donor+"/contigs.fasta > ./blast/"+donor+"-long_contig.fasta"
+
+        # run command
+        os.system(long_contig_command)
+
+
+def blast(subFamily):
+    '''With a given sub family and our long contig fasta files,
+        run blast commands'''
+    
+    # initializing commands to download and build the sub family database thru blast
+    download_genome_command = f"datasets download virus genome taxon {subFamily} --refseq --include genome"
+    unzip_command = "unzip ncbi_dataset.zip"
+    make_db_command = f"makeblastdb -in ncbi_dataset/data/genomic.fna -out ./blast/{subFamily} -title {subFamily} -dbtype nucl"
+
+    # run db commands
+    os.system(download_genome_command)
+    os.system(unzip_command)
+    os.system(make_db_command)
+
+    # iterating donor prefix names
+    for donor in os.listdir("./data/"):
+
+        # make directories for each donor in blast directory
+        os.makedirs(f"./blast/{donor}")
+
+        # initialize blast command
+        blast_command = f'blastn -query ./blast/{donor}-long_contig.fasta -db ./blast/{subFamily} \
+                        -out ./blast/{donor}/{subFamily}_blastn_results.csv \
+                        -outfmt "10 sacc pident length qstart qend sstart send bitscore evalue stitle"'
+        
+        os.system(blast_command)
+    
+    
