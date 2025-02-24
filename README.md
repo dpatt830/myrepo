@@ -1,7 +1,7 @@
 # Transcriptome Analysis Pipeline
 
 ## Overview
-This pipeline automates the analysis of the Human herpesevirus 5, also known as Human cytomegalovirus (HCMV), transcriptomes at **2 and 6 days post-infection (dpi)**. It retrieves sequencing data, processes reads, and identifies differentially expressed genes.
+This pipeline automates the analysis of the Human herpesevirus 5, also known as Human cytomegalovirus (HCMV), transcriptomes at **2 and 6 days post-infection (dpi)**. It retrieves sequencing data, processes reads, and identifies differentially expressed genes. This pipeline can be used for other transcriptomes as well.
 
 ## Features
 - Downloads transcriptomic data from NCBI SRA
