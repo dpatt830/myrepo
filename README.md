@@ -25,4 +25,4 @@ Ensure you have the following dependencies installed:
 
 | **R** | sleuth, dplyr  |
 
-## **2. Accessing Data
+## **2. Accessing Data**
