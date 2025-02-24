@@ -35,3 +35,8 @@ SRR Data: [SRR5660033 (Donor 1 - 6dpi)](https://trace.ncbi.nlm.nih.gov/Traces/?v
 SRR Data: [SRR5660044 (Donor 3 - 2dpi)](https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR5660044&display=data-access)
 
 SRR Data: [SRR5660045 (Donor 3 - 6dpi)](https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR5660045&display=data-access)
+
+To download and prepare the full HCMV paired end read data, please run the script below:
+```
+sh downloadData.sh
+```
