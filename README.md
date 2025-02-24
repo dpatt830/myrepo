@@ -19,10 +19,19 @@ Ensure you have the following dependencies installed:
 
 ### **Required Software**
 
-| **Unix/Linux** | kallisto, Bowtie2, SPAdes, samtools, BLAST+ |
+| **Unix/Linux** | fasterq-dump, kallisto, Bowtie2, SPAdes, samtools, BLAST+ |
 
 | **Python**    | biopython, pandas, os, subprocess | 
 
 | **R** | sleuth, dplyr  |
 
 ## **2. Accessing Data**
+Human herpesvirus 5 (HCMV) transcriptome data from two donors, both containing transcriptomes 2 days post infection (2dpi) and 6 days post infection (6dpi). Transcriptome data was found in NCBI, using ```{sh}wget``` to download each SRR run paired end read data. Next, ```{sh}fasterq-dump``` was utilized to uncompress the paired end fastq files and stored in a separate directory to be utilized in the ```{py}wrapper.py``` script.
+
+SRR Data: [SRR5660030 (Donor 1 (2dpi)]([url](https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR5660030&display=data-access))
+
+SRR Data: [SRR5660033 (Donor 1 (6dpi)]([[url](https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR5660033&display=data_access)]))
+
+SRR Data: [SRR5660044 (Donor 3 (2dpi)]([[url](https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR5660044&display=data-access)])
+
+SRR Data: [SRR5660045 (Donor 3 (6dpi)]([[url](https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR5660045&display=data-access)])
