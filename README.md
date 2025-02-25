@@ -50,10 +50,15 @@ To utilize this pipeline and wrapper, clone this repository, ensure all dependen
 python wrapper.py -i <INPUT DATA DIRECTORY> -o <OUTPUT DIRECTORY> -e <EMAIL ADDRESS (for NCBI/Entrez)> -a <GENOME ACCESSION NUMBER> -l <LOG FILE OUTPUT NAME> -s <SUBFAMILY NAME>
 ```
 | `-i | --input` -> Input directory where initial read/sequence data is stored. |
+
 | `-o | --output` -> Name the output directory where all subsequnet directories and files will be kept. |
+
 | `-e | --email` -> Email address to access NCBI Entrez searches. |
+
 | `-a | --accession` -> NCBI accession number of transcriptome to build indicies. |
+
 | `-l | --logFileName` -> Name the log file output. |
+
 | `-s | --subfamily` -> Name subfamily whose genome we are making a BLAST+ database of. |
 
 Keep in mind the `-i | --input` flag will change using the full dataset (`data`) and while using the sample dataset (`sampleData`)
