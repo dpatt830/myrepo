@@ -121,8 +121,8 @@ def kallistoTPM(index, logPath, inputPath):
         SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:-8] # everything before _#.fastq to get base name
 
         # getting forward and reverse fastq files
-        fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
-        rev = f"./data/{donorFolder}/{SRArun}_2.fastq"
+        fwd = f"./{inputPath}/{donorFolder}/{SRArun}_1.fastq"
+        rev = f"./{inputPath}/{donorFolder}/{SRArun}_2.fastq"
 
         # Create a kallisto output directory specific to each donor fastq pair
         kallistoOutput = f"kallisto/{donorFolder}"
@@ -130,7 +130,7 @@ def kallistoTPM(index, logPath, inputPath):
 
         # creating kallisto command
         # change index file command to {}
-        kallisto_command = f'nohup time kallisto quant -i {index} -o {kallistoOutput} -b 30 -t 2 {fwd} {rev} &'
+        kallisto_command = f'time kallisto quant -i {index} -o {kallistoOutput} -b 30 -t 2 {fwd} {rev}'
         os.system(kallisto_command)
     
     # preparing the header for tpm output
@@ -167,7 +167,7 @@ def metaData(kallistoOutput):
 
         # writing to the metadata txt file our sample, cond., and path
         for donor in os.listdir(f'./{kallistoOutput}/'):
-            meta.write(f'{donor} {donor[18:]} {kallistoOutput}/{donor}')
+            meta.write(f'{donor} {donor[-4:]} {kallistoOutput}/{donor}')
             meta.write("\n")
 
 def sleuthRun(logPath):
@@ -230,8 +230,8 @@ def bowtie(fastaFile, inputPath):
         rev = f"./data/{donorFolder}/{SRArun}_2.fastq"
 
         # creating bowtie2 mapping command
-        bowtieMapCommand = f'nohup bowtie2 --quiet -x ./{bowtie2_index}/HCMV -1 {fwd} -2 {rev} \
-                            -S ./{bowtie2_output}/{donorFolder}-map.sam --al-conc ./{bowtie2_output}/{donorFolder}-mapped_reads.fastq &'
+        bowtieMapCommand = f'bowtie2 --quiet -x ./{bowtie2_index}/HCMV -1 {fwd} -2 {rev} \
+                            -S ./{bowtie2_output}/{donorFolder}-map.sam --al-conc ./{bowtie2_output}/{donorFolder}-mapped_reads.fastq'
         os.system(bowtieMapCommand)
     
 def bowtieLogFile(logPath, inputPath):
