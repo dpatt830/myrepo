@@ -243,7 +243,7 @@ def bowtieLogFile(logPath, inputPath):
     after = []
 
     # iterating our donor folders with the fastq folders
-    for donorFolder in os.listdir(f"./{inputPath}/"):
+    for donorFolder in os.listdir(f"../{inputPath}/"):
         # accessing the SRA run accession ID
         SRArun = os.listdir(f"../{inputPath}/{donorFolder}")[0][:-8] # retrieving base name
 
