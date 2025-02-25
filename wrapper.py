@@ -362,28 +362,38 @@ def blast(subFamily):
 def blastLogFile(logPath):
     '''Write results from BLAST to log file'''
 
+    # open log file 
     with open(logPath, "a") as log:
         log.write("\n")
 
         # Initialize csv's of both blsatn csv results
         csv1 = f"./blast/donor1/Betaherpesvirinae_blastn_results.csv"
         csv3 = f"./blast/donor3/Betaherpesvirinae_blastn_results.csv"
-        
+
+	# begin to write BLAST hits
         log.write("Donor1:"+"\n")
+
+	# read lines of BLAST hits for Donor 1
         with open(csv1, 'r') as f1:
             blast_results1 = f1.readlines()
 
+	    # write all BLAST hits for Donor 1
             for i in blast_results1:
                 line1 = i.split(',')
                 string1 = "    ".join(line1)
                 log.write(string1)
+		    
         log.write("\n")
         log.write("Donor3:"+"\n")
+
+	# read lines of BLAST hits for Donor 3
         with open(csv3, 'r') as f3:
             blast_results3 = f3.readlines()
 
-            for k in range(10):
-                line3 = blast_results3[k].split(',')
+	    # write all of BLAST hits for Donor 3
+            #for k in range(10):
+	    for k in blast_results3:
+                line3 = k.split(',')
                 string3 = "    ".join(line3)
                 log.write(string3)
 
