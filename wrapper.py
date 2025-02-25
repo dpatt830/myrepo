@@ -56,7 +56,6 @@ def outputDirectory(dir_path):
 def buildLogFile(logFileName):
     '''Create out Log File/Output File'''
     log_file = open(f"logFileName", "w")
-    return log_file
 
 def extract_cds_to_fasta(accession, email):
     '''With valid email and accession number of genome, retrieve CDS seq,
