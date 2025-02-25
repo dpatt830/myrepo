@@ -67,10 +67,10 @@ Keep in mind the `-i | --input` flag will change using the full dataset (`data`)
 ## Examples
 If you are utilizing the **smapleData**, here is an example script to run:
 ```
-python wrapper.py -i sampleData -o Pipeline_result -e dpatterson3@luc.edu -a NC_006273.2 -l logFile.log -s Betaherpesevirinae
+python wrapper.py -i sampleData -o Pipeline_result -e dpatterson3@luc.edu -a NC_006273.2 -l logFile.log -s Betaherpesvirinae
 ```
 
 If you are utilizing the **full** dataset, here is an example script to run:
 ```
-python wrapper.py -i data -o Pipeline_result -e dpatterson3@luc.edu -a NC_006273.2 -l logFile.log -s Betaherpesevirinae
+python wrapper.py -i data -o Pipeline_result -e dpatterson3@luc.edu -a NC_006273.2 -l logFile.log -s Betaherpesvirinae
 ```
