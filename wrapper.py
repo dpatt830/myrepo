@@ -390,9 +390,9 @@ def blastLogFile(logPath):
         with open(csv3, 'r') as f3:
             blast_results3 = f3.readlines()
 
-	    # write all of BLAST hits for Donor 3
+	        # write all of BLAST hits for Donor 3
             #for k in range(10):
-	    for k in blast_results3:
+            for k in blast_results3:
                 line3 = k.split(',')
                 string3 = "    ".join(line3)
                 log.write(string3)
