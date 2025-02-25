@@ -117,8 +117,13 @@ def kallistoTPM(index, logPath, inputPath):
     # iterating thru each donor data folder
     for donorFolder in os.listdir(f"../{inputPath}/"):
 
-        # accessing the SRA run accession ID
-        SRArun = os.listdir(f"../{inputPath}/{donorFolder}")[1][:-8] # everything before _#.fastq to get base name
+        # finding full fast file name
+        for file_name in os.listdir(f'../{inputPath}/{donorFolder}/'):
+
+            if len(file_name)>10:  # SRA fastq file name
+
+                # accessing the SRA run accession ID
+                SRArun = file_name[:-8] # everything before _#.fastq to get base name
 
         # getting forward and reverse fastq files
         fwd = f"../{inputPath}/{donorFolder}/{SRArun}_1.fastq"
@@ -222,8 +227,13 @@ def bowtie(fastaFile, inputPath):
     # iterating thru each donor data folder; similar code to Kallisto run
     for donorFolder in os.listdir(f"../{inputPath}/"):
 
-        # accessing the SRA run accession ID
-        SRArun = os.listdir(f"../{inputPath}/{donorFolder}")[1][:-8] # retrieving base name as before in kallistoTPM()
+        # finding full fast file name
+        for file_name in os.listdir(f'../{inputPath}/{donorFolder}/'):
+
+            if len(file_name)>10:  # SRA fastq file name
+
+                # accessing the SRA run accession ID
+                SRArun = file_name[:-8] # everything before _#.fastq to get base name
 
         # getting forward and reverse fastq files
         fwd = f"../{inputPath}/{donorFolder}/{SRArun}_1.fastq"
@@ -244,9 +254,14 @@ def bowtieLogFile(logPath, inputPath):
 
     # iterating our donor folders with the fastq folders
     for donorFolder in os.listdir(f"../{inputPath}/"):
-        # accessing the SRA run accession ID
-        SRArun = os.listdir(f"../{inputPath}/{donorFolder}")[1][:-8] # retrieving base name
+        # finding full fast file name
+        for file_name in os.listdir(f'../{inputPath}/{donorFolder}/'):
 
+            if len(file_name)>10:  # SRA fastq file name
+
+                # accessing the SRA run accession ID
+                SRArun = file_name[:-8] # everything before _#.fastq to get base name
+        
         # getting forward fastq file of before and after bowtie mapping
         fwd = f"../{inputPath}/{donorFolder}/{SRArun}_1.fastq"
         fwd_mapped = f"./bowtie2-Output/{donorFolder}-mapped_reads.1.fastq"
