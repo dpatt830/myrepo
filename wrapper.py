@@ -118,7 +118,7 @@ def kallistoTPM(index, logPath, inputPath):
     for donorFolder in os.listdir(f"./{inputPath}/"):
 
         # accessing the SRA run accession ID
-        SRArun = os.listdir(f"./data/{donorFolder}")[0][:10]
+        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:-8] # everything before _#.fastq to get base name
 
         # getting forward and reverse fastq files
         fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
@@ -220,10 +220,10 @@ def bowtie(fastaFile, inputPath):
     os.system(bowtieIndexCommand)
 
     # iterating thru each donor data folder; similar code to Kallisto run
-    for donorFolder in os.listdir("./data/"):
+    for donorFolder in os.listdir(f"./{inputPath}/"):
 
         # accessing the SRA run accession ID
-        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:10]
+        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:-8] # retrieving base name as before in kallistoTPM()
 
         # getting forward and reverse fastq files
         fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
@@ -245,7 +245,7 @@ def bowtieLogFile(logPath, inputPath):
     # iterating our donor folders with the fastq folders
     for donorFolder in os.listdir(f"./{inputPath}/"):
         # accessing the SRA run accession ID
-        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:10]
+        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:-8] # retrieving base name
 
         # getting forward fastq file of before and after bowtie mapping
         fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
