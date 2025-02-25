@@ -63,3 +63,14 @@ python wrapper.py -i <INPUT DATA DIRECTORY> -o <OUTPUT DIRECTORY> -e <EMAIL ADDR
 | `-s | --subfamily` -> Name subfamily whose genome we are making a BLAST+ database of. |
 
 Keep in mind the `-i | --input` flag will change using the full dataset (`data`) or using the sample dataset (`sampleData`)
+
+## Examples
+If you are utilizing the **smapleData**, here is an example script to run:
+```
+python wrapper.py -i sampleData -o Pipeline_result -e dpatterson3@luc.edu -a NC_006273.2 -l logFile.log -s Betaherpesevirinae
+```
+
+If you are utilizing the **full** dataset, here is an example script to run:
+```
+python wrapper.py -i data -o Pipeline_result -e dpatterson3@luc.edu -a NC_006273.2 -l logFile.log -s Betaherpesevirinae
+```
