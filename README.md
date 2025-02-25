@@ -40,6 +40,7 @@ To download and prepare the full HCMV paired end read data, please run the scrip
 ```
 sh downloadData.sh
 ```
+**MAKE SURE TO CLONE REPOSITORY BEFORE RUNNING SHELL SCRIPT IF UTILIZING FULL DATASET**
 
 Also, within this repository there is **sample** data ready if you do not want to download the full dataset and want to test out the `wrapper.py` script. Please utilize the sample data held within the **"sampleData"** folder as the input data while testing `wrapper.py`. The **"sampleData"** folder contains shortened reads of the paired end fastaq files from the full dataset.
 
