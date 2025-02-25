@@ -112,7 +112,7 @@ def kallistoTPM(index, logPath, inputPath):
     '''Initializing Kallisto script'''
 
     # Create a kallisto output directory specific to each donor fastq pair
-    kallistoOutput = "kallisto"
+    kallistoDir = "kallisto"
     os.makedirs(kallistoOutput)
 
     # iterating thru each donor data folder
@@ -138,13 +138,13 @@ def kallistoTPM(index, logPath, inputPath):
     with open(logPath, 'a') as log:
         log.write("sample    condition    min_tpm    med_tpm    mean_tpm    max_tpm")
 
-    return kallistoOutput
+    return kallistoDir
 
 def quantifyTPM(logPath, kallistoOutput):
     '''Writing tpm output to log file'''
 
     # Iterating each folder in the results folder of our kallisto folder
-    for donor_folder in os.listdir(kallistoOutput):
+    for donor_folder in os.listdir(f'./{kallistoOutput}/'):
         
         # create a data frame of each abundance.tsv file & record the specific values within each donor
         df = pd.read_csv(f"./{kallistoOutput}/{donor_folder}/abundance.tsv", sep='\t')
