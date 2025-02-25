@@ -334,7 +334,7 @@ def blast(subFamily):
         run blast commands'''
     
     # initializing commands to download and build the sub family database thru blast
-    download_genome_command = f"datasets download virus genome taxon {subFamily} --refseq --include genome"
+    download_genome_command = f"datasets download virus genome taxon {subFamily}"
     unzip_command = "unzip ncbi_dataset.zip"
     make_db_command = f"makeblastdb -in ncbi_dataset/data/genomic.fna -out ./blast/{subFamily} -title {subFamily} -dbtype nucl"
 
