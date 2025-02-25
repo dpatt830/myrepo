@@ -107,7 +107,7 @@ def buildIndex(transcript_file, num_cds, log_path):
 
     return index_name
 
-def kallistoTPM(index, logPath):
+def kallistoTPM(index, logPath, inputPath):
     '''Initializing Kallisto script'''
 
     # Create a kallisto output directory specific to each donor fastq pair
@@ -115,7 +115,7 @@ def kallistoTPM(index, logPath):
     os.makedirs(kallistoOutput)
 
     # iterating thru each donor data folder
-    for donorFolder in os.listdir("./data/"):
+    for donorFolder in os.listdir(f"./{inputPath}/"):
 
         # accessing the SRA run accession ID
         SRArun = os.listdir(f"./data/{donorFolder}")[0][:10]
@@ -203,7 +203,7 @@ def HCMVgenome(accession, email):
 
     return fasta_output
 
-def bowtie(fastaFile):
+def bowtie(fastaFile, inputPath):
     '''With the full HCMV genome, build index using Bowtie 2,
         and see how many seqs map to it of our fastq seqs'''
 
@@ -223,7 +223,7 @@ def bowtie(fastaFile):
     for donorFolder in os.listdir("./data/"):
 
         # accessing the SRA run accession ID
-        SRArun = os.listdir(f"./data/{donorFolder}")[0][:10]
+        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:10]
 
         # getting forward and reverse fastq files
         fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
@@ -234,7 +234,7 @@ def bowtie(fastaFile):
                             -S ./{bowtie2_output}/{donorFolder}-map.sam --al-conc ./{bowtie2_output}/{donorFolder}-mapped_reads.fastq &'
         os.system(bowtieMapCommand)
     
-def bowtieLogFile(logPath):
+def bowtieLogFile(logPath, inputPath):
     '''With the SAM files output from our bowtie2 command, 
         write mapped reads to log file'''
     
@@ -243,9 +243,9 @@ def bowtieLogFile(logPath):
     after = []
 
     # iterating our donor folders with the fastq folders
-    for donorFolder in os.listdir("./data/"):
+    for donorFolder in os.listdir(f"./{inputPath}/"):
         # accessing the SRA run accession ID
-        SRArun = os.listdir(f"./data/{donorFolder}")[0][:10]
+        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:10]
 
         # getting forward fastq file of before and after bowtie mapping
         fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
@@ -269,30 +269,8 @@ def bowtieLogFile(logPath):
         log.write(f'Donor 1 (6dpi) had {int(before[1])} read pairs before Bowtie2 filtering and {int(after[1])} read pairs after.'+"\n")
         log.write(f'Donor 3 (2dpi) had {int(before[2])} read pairs before Bowtie2 filtering and {int(after[2])} read pairs after.'+"\n")
         log.write(f'Donor 3 (6dpi) had {int(before[3])} read pairs before Bowtie2 filtering and {int(after[3])} read pairs after.')
-    
-def sam_to_fastq():
-    '''Converting the donor sam files to fastq files'''
 
-    # creating a directory for SPAdes
-    os.makedirs("spades")
-
-    # iterating thru the sam files from bowtie2
-    for sam_file in os.listdir("bowtie2-Output"):
-
-        # initialize command to convert SAM files to BAM files
-        bam_creation = f'samtools view -bS -F 4 ./bowtie2-Output/{sam_file} | samtools sort -o ./bowtie2-Output/{sam_file[:11]}-map.sorted.bam'
-
-        # initialize command to convert BAM files to fastq
-        fastq_creation = f'samtools fastq ./bowtie2-Output/{sam_file[:11]}-map.sorted.bam \
-                            -1 ./bowtie2-Output/{sam_file[:11]}-mapped_R1.fastq \
-                            -2 ./bowtie2-Output/{sam_file[:11]}-mapped_R2.fastq'
-        
-        # run the two file conversion commands
-        os.system(bam_creation)
-        os.system(fastq_creation)
-
-
-def spades(logPath):
+def spades(logPath, inputPath):
     '''Running the spades program through the command line,
         using the mapped fastq files'''
     
@@ -303,7 +281,7 @@ def spades(logPath):
     donor_set = set()
 
     # iterating thru all the files in the bowtie2-Output directory
-    for donor in os.listdir("./data/"):
+    for donor in os.listdir(f"./{inputPath}/"):
         
         # initialize a single Donor/Patient
         donorSingle = donor[:6]
@@ -410,4 +388,18 @@ def blastLogFile(logPath):
                 log.write(string3)
 
 # Initialize functions
-outputDirectory()
+outputDirectory(outputPath)
+buildLogFile(logPath)
+transcriptomeFasta, numCDS = extract_cds_to_fasta(accession, email)
+indexName = buildIndex(transcriptomeFasta, numCDS, logPath)
+kallitstoPath = kallistoTPM(indexName, logPath, inputPath)
+quantifyTPM(logPath, kallitstoPath)
+metaData(kallitstoPath)
+sleuthRun(logPath)
+genomeFasta = HCMVgenome(accession, email)
+bowtie(genomeFasta, inputPath)
+bowtieLogFile(logPath, inputPath)
+spades(logPath, inputPath)
+contigs()
+blast(subfamily)
+blastLogFile(logPath)
