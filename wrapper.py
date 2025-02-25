@@ -5,48 +5,6 @@ import Bio.SeqRecord
 import pandas as pd
 import os
 import subprocess
-import argparse
-import sys
-
-#function to parse command line arguments
-def check_arg(args=None):
-    '''Command line arguments/flags'''
-
-	parser = argparse.ArgumentParser(description='Python wrapper for transcriptome analysis.')
-	parser.add_argument('-i', '--input',
-		help = 'path to input data directory',
-		required = 'True'
-		)	
-    parser.add_argument("-o", '--output',
-        help= 'path to output directory',
-        required=True
-        )
-	parser.add_argument('-a', '--accession',
-		help = 'NCBI Accession Number',
-		required = 'True'
-		)
-	parser.add_argument('-e', '--email',
-		help = 'Email Address',
-		required = 'True'
-		)
-	parser.add_argument('-l', '--logFileName',
-		help = 'Desired Log File Name',
-		required = 'True'
-		)
-	parser.add_argument('-s', '--subfamily',
-		help = 'Subfamily',
-		required = 'True'
-		)
-	return parser.parse_args(args)
-
-# retrieve command line arguments and assign to variables
-args = check_arg(sys.argv[1:])
-inputPath = args.input
-outputPath = args.output
-accession = args.accession
-email = args.email
-logPath = args.logFileName
-subfamily = args.subfamily
 
 # will need to make these input args
 email = "dpatterson3@luc.edu"
@@ -381,8 +339,41 @@ def blast(subFamily):
         # initialize blast command
         blast_command = f'blastn -query ./blast/{donor}-long_contig.fasta -db ./blast/{subFamily} \
                         -out ./blast/{donor}/{subFamily}_blastn_results.csv \
-                        -outfmt "10 sacc pident length qstart qend sstart send bitscore evalue stitle"'
+                        -outfmt "6 sacc pident length qstart qend sstart send bitscore evalue stitle"'
         
         os.system(blast_command)
     
+def blastLogFile(logPath):
+    '''Write results from BLAST to log file'''
+
+    with open(logPath, "a") as log: # opening log file
+        log.write("\n")
+
+        # Initialize csv's of both blsatn csv results
+        csv1 = f"./blast/donor1/Betaherpesvirinae_blastn_results.csv"
+        csv3 = f"./blast/donor3/Betaherpesvirinae_blastn_results.csv"
+
+	# write results of csv1 to log file by reading csv and writing all lines
+        log.write("Donor1:"+"\n")
+        with open(csv1, 'r') as f1:
+            blast_results1 = f1.readlines()
+            for i in blast_results1:
+                line1 = i.split(',')		# splitting by "," delimmiter
+                string1 = "    ".join(line1)	# joining row results by tab separation
+                log.write(string1)
+		    
+        log.write("\n")
+        log.write("Donor3:"+"\n")
+
+	# writing results of csv3 to log file; same as above
+        with open(csv3, 'r') as f3:
+            blast_results3 = f3.readlines()
+
+	    # iterating thru 10 to get the first 10 hits of blast result
+	    # same as for csv1 results written to log file
+            for k in range(10):
+                line3 = blast_results3[k].split(',')
+                string3 = "    ".join(line3)
+                log.write(string3)
+        
 
