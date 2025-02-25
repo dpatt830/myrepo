@@ -113,7 +113,7 @@ def kallistoTPM(index, logPath, inputPath):
 
     # Create a kallisto output directory specific to each donor fastq pair
     kallistoDir = "kallisto"
-    os.makedirs(kallistoOutput)
+    os.makedirs(kallistoDir)
 
     # iterating thru each donor data folder
     for donorFolder in os.listdir(f"../{inputPath}/"):
