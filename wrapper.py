@@ -51,6 +51,7 @@ subfamily = args.subfamily
 def outputDirectory(dir_path):
     '''Creating an output directory'''
     os.makedirs(dir_path)
+    os.chdir(dir_path)
 
 def buildLogFile(logFileName):
     '''Create out Log File/Output File'''
