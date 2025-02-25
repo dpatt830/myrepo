@@ -175,7 +175,7 @@ def sleuthRun(logPath):
     '''Running sleuth script and writing to logfile'''
 
     # run our sleuth.R script
-    os.system("Rscript sleuth.R")
+    os.system("Rscript ../sleuth.R/")
 
     # with the fdr results txt, make a df
     df = pd.read_csv("fdr05_results.txt",delimiter=" ")
