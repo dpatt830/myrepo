@@ -370,29 +370,49 @@ def blastLogFile(logPath):
 	# begin to write BLAST hits
         log.write("Donor1:"+"\n")
 
-	# read lines of BLAST hits for Donor 1
+        # read lines of BLAST hits for Donor 1
         with open(csv1, 'r') as f1:
             blast_results1 = f1.readlines()
 
-	    # write all BLAST hits for Donor 1
-            for i in blast_results1:
-                line1 = i.split(',')
-                string1 = "    ".join(line1)
-                log.write(string1)
-		    
+            
+            # Sometimes there are not 10 or more hits #
+            # If there are write only the top ten hits
+            if (len(blast_results1)) >= 10:
+                for i in range(10):
+                    line1 = blast_results1[i].split(",")
+                    string1 = "    ".join(line1)
+                    log.write(string1)
+
+            # If there is less than ten, write them all
+            else:
+                for i in blast_results1:
+                    line1 = i.split(',')
+                    string1 = "    ".join(line1)
+                    log.write(string1)
+		
+        # writing to log file for nice format
         log.write("\n")
         log.write("Donor3:"+"\n")
 
-	# read lines of BLAST hits for Donor 3
+	    # read lines of BLAST hits for Donor 3                
         with open(csv3, 'r') as f3:
             blast_results3 = f3.readlines()
 
-	        # write all of BLAST hits for Donor 3
-            #for k in range(10):
-            for k in blast_results3:
-                line3 = k.split(',')
-                string3 = "    ".join(line3)
-                log.write(string3)
+            
+            # Sometimes there are not 10 or more hits #
+            # If there are write only the top ten hits
+            if (len(blast_results3)) >= 10:
+                for k in range(10):
+                    line3 = blast_results3[k].split(",")
+                    string3 = "    ".join(line3)
+                    log.write(string3)
+
+            # If there is less than ten, write them all
+            else:
+                for k in blast_results3:
+                    line3 = k.split(',')
+                    string3 = "    ".join(line3)
+                    log.write(string3)
 
 # Initialize functions
 outputDirectory(outputPath)
