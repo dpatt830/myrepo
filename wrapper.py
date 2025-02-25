@@ -5,6 +5,48 @@ import Bio.SeqRecord
 import pandas as pd
 import os
 import subprocess
+import argparse
+import sys
+
+#function to parse command line arguments
+def check_arg(args=None):
+    '''Command line arguments/flags'''
+
+	parser = argparse.ArgumentParser(description='Python wrapper for transcriptome analysis.')
+	parser.add_argument('-i', '--input',
+		help = 'path to input data directory',
+		required = 'True'
+		)	
+    parser.add_argument("-o", '--output',
+        help= 'path to output directory',
+        required=True
+        )
+	parser.add_argument('-a', '--accession',
+		help = 'NCBI Accession Number',
+		required = 'True'
+		)
+	parser.add_argument('-e', '--email',
+		help = 'Email Address',
+		required = 'True'
+		)
+	parser.add_argument('-l', '--logFileName',
+		help = 'Desired Log File Name',
+		required = 'True'
+		)
+	parser.add_argument('-s', '--subfamily',
+		help = 'Subfamily',
+		required = 'True'
+		)
+	return parser.parse_args(args)
+
+# retrieve command line arguments and assign to variables
+args = check_arg(sys.argv[1:])
+inputPath = args.input
+outputPath = args.output
+accession = args.accession
+email = args.email
+logPath = args.logFileName
+subfamily = args.subfamily
 
 # will need to make these input args
 email = "dpatterson3@luc.edu"
@@ -192,7 +234,8 @@ def bowtie(fastaFile):
         rev = f"./data/{donorFolder}/{SRArun}_2.fastq"
 
         # creating bowtie2 mapping command
-        bowtieMapCommand = f'nohup bowtie2 --quiet -x ./{bowtie2_index}/HCMV -1 {fwd} -2 {rev} -S ./{bowtie2_output}/{donorFolder}-map.sam &'
+        bowtieMapCommand = f'nohup bowtie2 --quiet -x ./{bowtie2_index}/HCMV -1 {fwd} -2 {rev} \
+                            -S ./{bowtie2_output}/{donorFolder}-map.sam --al-conc ./{bowtie2_output}/{donorFolder}-mapped_reads.fastq &'
         os.system(bowtieMapCommand)
     
 def bowtieLogFile(logPath):
@@ -208,29 +251,29 @@ def bowtieLogFile(logPath):
         # accessing the SRA run accession ID
         SRArun = os.listdir(f"./data/{donorFolder}")[0][:10]
 
-        # getting forward fastq file
+        # getting forward fastq file of before and after bowtie mapping
         fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
+        fwd_mapped = f"./bowtie2-Output/{donorFolder}-mapped_reads.1.fastq"
         
         # using subprocess to hold the output of the number of read pairs before for each donor
-        reads_before = int(subprocess.check_output(f"wc -l < {fwd}", shell=True).strip())
-        
-        # appending result to before list
-        before.append(reads_before)
-    
-    # iterating each sam file output
-    for sam_file in os.listdir("./bowtie2-Output"):
-        # using samtools to count the num of read pairs in our sam files and appending to after list
-        mapped_reads = int(subprocess.check_output(f"samtools view -F 4 ./bowtie2-Output/{sam_file} | wc -l", shell=True).strip())
-        after.append(mapped_reads)
+        reads_before = (int(subprocess.check_output(f"wc -l < {fwd}", shell=True).strip())) / 4
 
+        # using samtools to count the num of read pairs in our sam files and appending to after list
+        mapped_reads = (int(subprocess.check_output(f"wc -l < {fwd_mapped}", shell=True).strip())) / 4
+
+        # appending results to before and after list
+        before.append(reads_before)
+        after.append(mapped_reads)
+    
     # writing to log file our read pairs from the lists
     with open(logPath, 'a') as log:
         log.write("\n")
-        log.write(f'Donor 1 (2dpi) had {before[0]} read pairs before Bowtie2 filtering and {after[0]} read pairs after.'+"\n")
-        log.write(f'Donor 1 (6dpi) had {before[1]} read pairs before Bowtie2 filtering and {after[1]} read pairs after.'+"\n")
-        log.write(f'Donor 3 (2dpi) had {before[2]} read pairs before Bowtie2 filtering and {after[2]} read pairs after.'+"\n")
-        log.write(f'Donor 3 (6dpi) had {before[3]} read pairs before Bowtie2 filtering and {after[3]} read pairs after.')
-
+        log.write("\n")
+        log.write(f'Donor 1 (2dpi) had {int(before[0])} read pairs before Bowtie2 filtering and {int(after[0])} read pairs after.'+"\n")
+        log.write(f'Donor 1 (6dpi) had {int(before[1])} read pairs before Bowtie2 filtering and {int(after[1])} read pairs after.'+"\n")
+        log.write(f'Donor 3 (2dpi) had {int(before[2])} read pairs before Bowtie2 filtering and {int(after[2])} read pairs after.'+"\n")
+        log.write(f'Donor 3 (6dpi) had {int(before[3])} read pairs before Bowtie2 filtering and {int(after[3])} read pairs after.')
+    
 def sam_to_fastq():
     '''Converting the donor sam files to fastq files'''
 
@@ -260,19 +303,33 @@ def spades(logPath):
     # initializing spades directory
     spades_dir = "./spades"
 
+    # Initialize donor set
+    donor_set = set()
+
     # iterating thru all the files in the bowtie2-Output directory
     for donor in os.listdir("./data/"):
+        
+        # initialize a single Donor/Patient
+        donorSingle = donor[:6]
 
+        donor_set.add(donorSingle)
+
+    # Iterating over set that will hold {"donor1", "donor3"}
+    for patient in donor_set:
         # initialize forward and reverse mapped fastq file pairs
-        fwd = f"{donor}-mapped_R1.fastq"
-        rev = f"{donor}-mapped_R2.fastq"
+        fwd_2dpi = f"{patient}-2dpi-mapped_reads.1.fastq"
+        rev_2dpi = f"{patient}-2dpi-mapped_reads.2.fastq"
+        fwd_6dpi = f"{patient}-6dpi-mapped_reads.1.fastq"
+        rev_6dpi = f"{patient}-6dpi-mapped_reads.2.fastq"
 
         # create new donor directory for spades outputs for each donor
-        donor_output_dir = f"{spades_dir}/{donor}"
+        donor_output_dir = f"{spades_dir}/{patient}"
         os.makedirs(donor_output_dir)
 
         # create spades command
-        spades_command = f"spades.py -k 77 -t 2 --only-assembler -1 ./bowtie2-Output/{fwd} -2 ./bowtie2-Output/{rev} -o {donor_output_dir}"
+        spades_command = f"spades.py -k 77 -t 2 --only-assembler \
+              --pe-1 1 ./bowtie2-Output/{fwd_2dpi} --pe-2 1 ./bowtie2-Output/{rev_2dpi} --pe-1 2 ./bowtie2-Output/{fwd_6dpi} --pe-2 2 ./bowtie2-Output/{rev_6dpi}\
+                -o {donor_output_dir}"
 
         # run spades command
         os.system(spades_command)
@@ -292,7 +349,7 @@ def contigs():
     os.makedirs(blast_dir)
 
     # for each donor prefix name
-    for donor in os.listdir("./data/"):
+    for donor in os.listdir("./spades/"):
 
         # creating command to grab the first seq in contigs.fasta file for each donor and create fasta file in blast directory
         long_contig_command = "awk '/^>/ {if (seq) exit; seq=1} {print}' ./spades/"+donor+"/contigs.fasta > ./blast/"+donor+"-long_contig.fasta"
@@ -316,7 +373,7 @@ def blast(subFamily):
     os.system(make_db_command)
 
     # iterating donor prefix names
-    for donor in os.listdir("./data/"):
+    for donor in os.listdir("./spades/"):
 
         # make directories for each donor in blast directory
         os.makedirs(f"./blast/{donor}")
@@ -328,4 +385,4 @@ def blast(subFamily):
         
         os.system(blast_command)
     
-    
+
