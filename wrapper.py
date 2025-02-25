@@ -102,7 +102,7 @@ def buildIndex(transcript_file, num_cds, log_path):
 
     # Writing output to log file
     with open(log_path, "w") as log:
-        log.write(f"The HCMV genome (NC_006273.2) has {num_cds} CDS.")
+        log.write(f"The HCMV genome (NC_006273.2) has {num_cds} CDS."+"\n")
         log.write("\n")
 
     return index_name
@@ -264,11 +264,11 @@ def bowtieLogFile(logPath, inputPath):
     # writing to log file our read pairs from the lists
     with open(logPath, 'a') as log:
         log.write("\n")
-        log.write("\n")
         log.write(f'Donor 1 (2dpi) had {int(before[0])} read pairs before Bowtie2 filtering and {int(after[0])} read pairs after.'+"\n")
         log.write(f'Donor 1 (6dpi) had {int(before[1])} read pairs before Bowtie2 filtering and {int(after[1])} read pairs after.'+"\n")
         log.write(f'Donor 3 (2dpi) had {int(before[2])} read pairs before Bowtie2 filtering and {int(after[2])} read pairs after.'+"\n")
-        log.write(f'Donor 3 (6dpi) had {int(before[3])} read pairs before Bowtie2 filtering and {int(after[3])} read pairs after.')
+        log.write(f'Donor 3 (6dpi) had {int(before[3])} read pairs before Bowtie2 filtering and {int(after[3])} read pairs after.'+"\n")
+        log.write("\n")
 
 def spades(logPath, inputPath):
     '''Running the spades program through the command line,
@@ -301,16 +301,13 @@ def spades(logPath, inputPath):
         os.makedirs(donor_output_dir)
 
         # create spades command
-        spades_command = f"spades.py -k 77 -t 2 --only-assembler \
-              --pe-1 1 ./bowtie2-Output/{fwd_2dpi} --pe-2 1 ./bowtie2-Output/{rev_2dpi} --pe-1 2 ./bowtie2-Output/{fwd_6dpi} --pe-2 2 ./bowtie2-Output/{rev_6dpi}\
-                -o {donor_output_dir}"
+        spades_command = f"spades.py -k 77 -t 2 --only-assembler --pe-1 1 ./bowtie2-Output/{fwd_2dpi} --pe-2 1 ./bowtie2-Output/{rev_2dpi} --pe-1 2 ./bowtie2-Output/{fwd_6dpi} --pe-2 2 ./bowtie2-Output/{rev_6dpi} -o {donor_output_dir}"
 
         # run spades command
         os.system(spades_command)
 
         # write spades commands to log file
         with open(logPath, 'a') as log:
-            log.write("\n")
             log.write(spades_command+"\n")
 
 def contigs():
