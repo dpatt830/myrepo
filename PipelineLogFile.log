@@ -1,0 +1,59 @@
+The HCMV genome (NC_006273.2) has 169 CDS.
+
+sample    condition    min_tpm    med_tpm    mean_tpm    max_tpm
+donor1-2dp        0.0    1877.01    5917.1601786982255    76933.3
+donor1-6dp        0.0    1980.99    5917.1598857988165    177497.0
+donor3-2dp        0.0    1906.83    5917.161822485207    222794.0
+donor3-6dp        0.0    1087.21    5917.163998816567    400458.0
+
+target_id	test_stat	pval	qval
+YP_081530.1	15.174629499138	9.80114528654774e-05	0.0084399077102775
+YP_081547.1	15.0238261070738	0.0001061623611355	0.0084399077102775
+YP_081552.1	14.0537332898489	0.0001776608029558	0.00941602255666
+YP_081551.1	12.4631872707722	0.0004150511158023	0.0164982818531442
+YP_081577.1	11.8642631576172	0.000572214055292	0.0176798459403584
+YP_081489.1	11.5785651903492	0.0006671639977493	0.0176798459403584
+YP_081574.1	11.0341336172115	0.0008944947027973	0.0187461795058074
+YP_081521.1	10.8637485389882	0.0009806499669533	0.0187461795058074
+YP_081576.1	10.7177879946906	0.0010611045003287	0.0187461795058074
+YP_081490.1	10.1900727813234	0.0014119874204058	0.0224505999844532
+YP_081522.1	9.38748242582979	0.0021847201776683	0.0315791371135704
+YP_081561.1	8.95267235307347	0.0027706398157598	0.0367109775588184
+YP_081613.1	8.63955168258427	0.0032894236623875	0.0402321817168936
+YP_081600.1	8.39486730593993	0.0037628197924088	0.042734881928072
+YP_081520.1	8.25292129673253	0.0040686471173155	0.0431276594435449
+YP_081533.1	8.03338764990763	0.0045922869895229	0.0456358519583844
+YP_081601.1	7.86874282184583	0.0050296609393083	0.0470421229029432
+YP_081595.1	7.68055224934831	0.0055819083413545	0.0493068570152982
+
+Donor 1 (2dpi) had 2259287 read pairs before Bowtie2 filtering and 1562296 read pairs after.
+Donor 1 (6dpi) had 2004530 read pairs before Bowtie2 filtering and 1249472 read pairs after.
+Donor 3 (2dpi) had 2730258 read pairs before Bowtie2 filtering and 1922300 read pairs after.
+Donor 3 (6dpi) had 2476889 read pairs before Bowtie2 filtering and 1274769 read pairs after.
+
+spades.py -k 77 -t 2 --only-assembler --pe-1 1 ./bowtie2-Output/donor3-2dpi-mapped_reads.1.fastq --pe-2 1 ./bowtie2-Output/donor3-2dpi-mapped_reads.2.fastq --pe-1 2 ./bowtie2-Output/donor3-6dpi-mapped_reads.1.fastq --pe-2 2 ./bowtie2-Output/donor3-6dpi-mapped_reads.2.fastq -o ./spades/donor3
+spades.py -k 77 -t 2 --only-assembler --pe-1 1 ./bowtie2-Output/donor1-2dpi-mapped_reads.1.fastq --pe-2 1 ./bowtie2-Output/donor1-2dpi-mapped_reads.2.fastq --pe-1 2 ./bowtie2-Output/donor1-6dpi-mapped_reads.1.fastq --pe-2 2 ./bowtie2-Output/donor1-6dpi-mapped_reads.2.fastq -o ./spades/donor1
+
+Donor1:
+EF999921.1    99.954    4366    1    4365    99996    104361    8050    0.0    EF999921.1 Human herpesvirus 5 strain TB40/E clone TB40-BAC4     complete sequence
+KF297339.1    99.954    4366    1    4365    67955    72320    8050    0.0    KF297339.1 Human herpesvirus 5 strain TB40/E clone Lisa     complete genome
+MT070140.1    99.954    4366    1    4365    67726    72091    8050    0.0    MT070140.1 UNVERIFIED: Human betaherpesvirus 5 isolate P10     complete genome
+MT044484.1    99.954    4366    1    4365    67307    71672    8050    0.0    MT044484.1 Human betaherpesvirus 5 strain HAN-SOT4     complete genome
+MW439039.1    99.954    4366    1    4365    67354    71719    8050    0.0    MW439039.1 Human betaherpesvirus 5 strain TB40/EE     complete genome
+MW439038.1    99.954    4366    1    4365    67354    71719    8050    0.0    MW439038.1 Human betaherpesvirus 5 strain TB40/EF     complete genome
+KT726951.2    99.931    4366    1    4365    67446    71811    8045    0.0    KT726951.2 Human betaherpesvirus 5 strain UK/Lon8/Urine/2012     complete genome
+KX544839.1    99.885    4366    1    4365    99977    104339    8032    0.0    KX544839.1 Human betaherpesvirus 5 isolate TB40-E_UNC     complete genome
+KP745647.1    99.863    4366    1    4365    67574    71939    8028    0.0    KP745647.1 Human herpesvirus 5 strain BE/18/2010     complete genome
+KT726954.2    99.863    4366    1    4365    67473    71838    8028    0.0    KT726954.2 Human betaherpesvirus 5 strain UK/Lon4/Bile/2011     partial genome
+
+Donor3:
+EF999921.1    100.000    38244    1    38244    84082    122325    70624    0.0    EF999921.1 Human herpesvirus 5 strain TB40/E clone TB40-BAC4     complete sequence
+KF297339.1    100.000    38244    1    38244    52041    90284    70624    0.0    KF297339.1 Human herpesvirus 5 strain TB40/E clone Lisa     complete genome
+MT070140.1    100.000    38244    1    38244    51812    90055    70624    0.0    MT070140.1 UNVERIFIED: Human betaherpesvirus 5 isolate P10     complete genome
+MW439039.1    100.000    38244    1    38244    51440    89683    70624    0.0    MW439039.1 Human betaherpesvirus 5 strain TB40/EE     complete genome
+MW439038.1    100.000    38244    1    38244    51440    89683    70624    0.0    MW439038.1 Human betaherpesvirus 5 strain TB40/EF     complete genome
+KX544839.1    99.974    38244    1    38244    84065    122300    70561    0.0    KX544839.1 Human betaherpesvirus 5 isolate TB40-E_UNC     complete genome
+MT044484.1    99.958    38244    1    38244    51393    89632    70532    0.0    MT044484.1 Human betaherpesvirus 5 strain HAN-SOT4     complete genome
+KJ361955.1    99.692    38253    1    38244    51346    89597    69978    0.0    KJ361955.1 Human herpesvirus 5 strain HAN33     complete genome
+MT649469.1    99.509    38255    1    38244    51530    89772    69581    0.0    MT649469.1 Human betaherpesvirus 5 strain HAN-SCT18     complete genome
+MT070139.1    99.503    38258    1    38244    50284    88536    69579    0.0    MT070139.1 Human betaherpesvirus 5 isolate P6     complete genome
