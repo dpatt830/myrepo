@@ -221,14 +221,14 @@ def bowtie(fastaFile, inputPath):
     os.system(bowtieIndexCommand)
 
     # iterating thru each donor data folder; similar code to Kallisto run
-    for donorFolder in os.listdir(f"./{inputPath}/"):
+    for donorFolder in os.listdir(f"../{inputPath}/"):
 
         # accessing the SRA run accession ID
-        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:-8] # retrieving base name as before in kallistoTPM()
+        SRArun = os.listdir(f"../{inputPath}/{donorFolder}")[0][:-8] # retrieving base name as before in kallistoTPM()
 
         # getting forward and reverse fastq files
-        fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
-        rev = f"./data/{donorFolder}/{SRArun}_2.fastq"
+        fwd = f"../{inputPath}/{donorFolder}/{SRArun}_1.fastq"
+        rev = f"../{inputPath}/{donorFolder}/{SRArun}_2.fastq"
 
         # creating bowtie2 mapping command
         bowtieMapCommand = f'bowtie2 --quiet -x ./{bowtie2_index}/HCMV -1 {fwd} -2 {rev} \
@@ -246,10 +246,10 @@ def bowtieLogFile(logPath, inputPath):
     # iterating our donor folders with the fastq folders
     for donorFolder in os.listdir(f"./{inputPath}/"):
         # accessing the SRA run accession ID
-        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:-8] # retrieving base name
+        SRArun = os.listdir(f"../{inputPath}/{donorFolder}")[0][:-8] # retrieving base name
 
         # getting forward fastq file of before and after bowtie mapping
-        fwd = f"./data/{donorFolder}/{SRArun}_1.fastq"
+        fwd = f"../{inputPath}/{donorFolder}/{SRArun}_1.fastq"
         fwd_mapped = f"./bowtie2-Output/{donorFolder}-mapped_reads.1.fastq"
         
         # using subprocess to hold the output of the number of read pairs before for each donor
@@ -282,7 +282,7 @@ def spades(logPath, inputPath):
     donor_set = set()
 
     # iterating thru all the files in the bowtie2-Output directory
-    for donor in os.listdir(f"./{inputPath}/"):
+    for donor in os.listdir(f"../{inputPath}/"):
         
         # initialize a single Donor/Patient
         donorSingle = donor[:6]
