@@ -77,7 +77,7 @@ python wrapper.py -i data -o Pipeline_result -e dpatterson3@luc.edu -a NC_006273
 **AGAIN** keep in mind before running `wrapper` script, download the full data set by running the shell command listed in **Part 2**
 
 ## Extra
-Provided below are links to each dependency/library homepage for more information on how to use as well as install:
+Provided below are links to each dependency/library homepage or documentation for more information on how to use as well as install:
 * **Unix/Linux** -> [fasterq-dump](https://github.com/ncbi/sra-tools/wiki/HowTo:-fasterq-dump), [kallisto](https://github.com/pachterlab/kallisto), [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml), [SPAdes](https://github.com/ablab/spades), [NCBI Datasets CLI](https://github.com/ncbi/datasets), [BLAST+](https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html)
 
 * **Python** -> [biopython](https://biopython.org), [pandas](https://pandas.pydata.org), [os](https://docs.python.org/3/library/os.html), [subprocess](https://docs.python.org/3/library/subprocess.html)
