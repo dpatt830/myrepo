@@ -51,11 +51,11 @@ subfamily = args.subfamily
 def outputDirectory(dir_path):
     '''Creating an output directory'''
     os.makedirs(dir_path)
-    os.chdir(dir_path)
+    os.chdir(directory)
 
 def buildLogFile(logFileName):
     '''Create out Log File/Output File'''
-    log_file = open(logFileName, "w")
+    log_file = open(f"logFileName", "w")
     return log_file
 
 def extract_cds_to_fasta(accession, email):
@@ -116,14 +116,14 @@ def kallistoTPM(index, logPath, inputPath):
     os.makedirs(kallistoOutput)
 
     # iterating thru each donor data folder
-    for donorFolder in os.listdir(f"./{inputPath}/"):
+    for donorFolder in os.listdir(f"../{inputPath}/"):
 
         # accessing the SRA run accession ID
-        SRArun = os.listdir(f"./{inputPath}/{donorFolder}")[0][:-8] # everything before _#.fastq to get base name
+        SRArun = os.listdir(f"../{inputPath}/{donorFolder}")[0][:-8] # everything before _#.fastq to get base name
 
         # getting forward and reverse fastq files
-        fwd = f"./{inputPath}/{donorFolder}/{SRArun}_1.fastq"
-        rev = f"./{inputPath}/{donorFolder}/{SRArun}_2.fastq"
+        fwd = f"../{inputPath}/{donorFolder}/{SRArun}_1.fastq"
+        rev = f"../{inputPath}/{donorFolder}/{SRArun}_2.fastq"
 
         # Create a kallisto output directory specific to each donor fastq pair
         kallistoOutput = f"kallisto/{donorFolder}"
